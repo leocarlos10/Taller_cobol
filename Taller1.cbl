@@ -12,7 +12,7 @@
        FILE-CONTROL.
        SELECT OPTIONAL EMPLEADO-ARCHIVO
            ASSIGN TO
-           "database.txt"
+           "Taller1.txt"
            ORGANIZATION IS SEQUENTIAL.
 
        DATA DIVISION.
@@ -44,14 +44,28 @@
        MAIN-LOGIC SECTION.
 
        Empezar-programa.
-           PERFORM INTERFAZ-APP. 
+           PERFORM INTERFAZ-APP.
+           
+           IF OPCION = 1
+               DISPLAY "Mostrando Empleados".
+           IF OPCION = 2
+               PERFORM Abrir-archivo
+               MOVE "S" TO si-no
+               PERFORM Agregar-registro
+                   UNTIL si-no = "N"
+               PERFORM cerrar-registro.
+           
+           IF OPCION = 3
+              DISPLAY "Mostrar Empleado que mas gana".
+           
+           IF OPCION = 4
+              DISPLAY "Total de La nomina".
 
-           PERFORM Abrir-archivo.
-           MOVE "S" TO si-no.
-           PERFORM Agregar-registro
-           UNTIL si-no = "N".
-           PERFORM cerrar-registro.
+           IF OPCION = 5
+              DISPLAY "Promedio Sueldos Basicos".
+                       
            STOP RUN.
+        
 
        Interfaz-App.
            DISPLAY "-----------------------------------".
@@ -63,7 +77,10 @@
            DISPLAY "3. Mostrar empleado Que mas gana".
            DISPLAY "4. Total de la nomina".
            DISPLAY "5. Calcular Promedio Sueldos Basicos".
+               
+           DISPLAY "0. Cerrar".
 
+       
            DISPLAY "Selecione > ".
            ACCEPT  opcion.
 
