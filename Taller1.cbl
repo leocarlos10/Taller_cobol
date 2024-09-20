@@ -11,8 +11,10 @@
 
        FILE-CONTROL.
        SELECT OPTIONAL EMPLEADO-ARCHIVO
+
            ASSIGN TO
            "Taller1.txt"
+
            ORGANIZATION IS SEQUENTIAL.
 
        DATA DIVISION.
