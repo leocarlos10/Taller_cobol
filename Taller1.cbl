@@ -10,8 +10,9 @@
        INPUT-OUTPUT SECTION.
 
        FILE-CONTROL.
-       SELECT OPTIONAL EMPLEADO-ARCHIVO
-           ASSIGN TO "Taller1.txt"
+       SELECT OPTIONAL  EMPLEADO-ARCHIVO
+           ASSIGN TO
+           "datos.txt"
            ORGANIZATION IS SEQUENTIAL.
 
        DATA DIVISION.
@@ -22,7 +23,7 @@
                05 Empleado-nombre PIC x(30).
                05 Empleado-direccion PIC x(20).
                05 Empleado-telefono PIC x(12).
-               05 Empleado-salario-basico PIC 9(5)v999999.
+               05 Empleado-salario-basico PIC 9(8).
 
        WORKING-STORAGE SECTION.
            77 cedula PIC x(17) VALUE "Ingresa tu cedula".
