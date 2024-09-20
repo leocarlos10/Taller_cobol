@@ -11,8 +11,7 @@
 
        FILE-CONTROL.
        SELECT OPTIONAL EMPLEADO-ARCHIVO
-           ASSIGN TO
-           "C:\Users\USUARIO\OneDrive\Documentos\archivos\Taller1.txt"
+           ASSIGN TO "Taller1.txt"
            ORGANIZATION IS SEQUENTIAL.
 
        DATA DIVISION.
