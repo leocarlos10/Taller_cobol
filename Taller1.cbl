@@ -71,6 +71,10 @@
        Empezar-programa.
            PERFORM INTERFAZ-APP.
 
+           IF OPCION = 0
+               STOP RUN
+           END-IF
+
            IF OPCION = 1
             PERFORM Apertura-archivo
             MOVE ZEROES TO Maximos-Registros
@@ -79,6 +83,7 @@
             PERFORM Muestra-Registro
                UNTIL Fin-Del-Archivo = "0"
             PERFORM cerrar-registro
+
            END-IF
 
            IF OPCION = 2
@@ -87,6 +92,7 @@
             PERFORM Agregar-registro
              UNTIL si-no = "N"
            PERFORM cerrar-registro
+
            END-IF
 
            IF OPCION = 3
@@ -101,7 +107,8 @@
                PERFORM MostrarEmpl-sal-encima-promedio
            END-IF
 
-           STOP RUN.
+           GO TO Empezar-programa.
+
 
 
        Interfaz-App.
