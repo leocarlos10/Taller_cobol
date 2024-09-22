@@ -41,7 +41,6 @@
            01  Fin-Del-Archivo PIC X.
            01  Maximos-Registros PIC 99.
            01  Guarda-Enter PIC X.
-
       * variables para guardar los datos de los empleados.
          77 cedula PIC x(17)    VALUE  "Ingresa tu cedula".
          77 nombre PIC x(17)    VALUE  "Ingresa tu nombre".
@@ -51,6 +50,17 @@
          77 si-no PIC x.
          77 entrada PIC x.
          77 opcion PIC x.
+      * variables para poder buscar un empleado por el nombre
+        77 Nombre-Buscado PIC x(30).
+        77 encontrado PIC x VALUE "N".
+      * variables para la funcionalidad de empleado que mas
+        77 SALARIO-MAX PIC x(30).
+        77 NOMBRE-EMPLEADO PIC x(30).
+      * promedio del salario basico de los empleados.
+        77 contador PIC 99.
+        77 suma-salarios PIC 9(8).
+        77 promedio-salario-basico PIC 9(8).
+        77 band-Empleados-encontrados PIC x VALUE "N".
 
 
 
@@ -62,7 +72,6 @@
            PERFORM INTERFAZ-APP.
 
            IF OPCION = 1
-            DISPLAY "se ejecutó la opción 1"
             PERFORM Apertura-archivo
             MOVE ZEROES TO Maximos-Registros
             MOVE "1" TO Fin-Del-Archivo
@@ -73,7 +82,6 @@
            END-IF
 
            IF OPCION = 2
-            DISPLAY "se ejecutó la opción 2"
             PERFORM Abrir-archivo
             MOVE "S" TO si-no
             PERFORM Agregar-registro
@@ -82,15 +90,15 @@
            END-IF
 
            IF OPCION = 3
-               DISPLAY "se ejecutó la opción 3"
+              PERFORM EMPLEADO-MAS-GANA
            END-IF
 
            IF OPCION = 4
-             DISPLAY "Total de La nomina"
+             PERFORM Buscar-Empleado-Por-Nombre
            END-IF
 
            IF OPCION = 5
-               DISPLAY "Promedio Sueldos Básicos"
+               PERFORM MostrarEmpl-sal-encima-promedio
            END-IF
 
            STOP RUN.
@@ -103,9 +111,10 @@
 
            DISPLAY "1. Mostrar todos los empleados".
            DISPLAY "2. Ingresar empleados".
-           DISPLAY "3. Mostrar empleado Que mas gana".
-           DISPLAY "4. Total de la nomina".
-           DISPLAY "5. Calcular Promedio Sueldos Basicos".
+           DISPLAY "3. Mostrar el empleado que mas gana ".
+           DISPLAY "4. Buscar info empleado por el nombre".
+           DISPLAY
+           "5. Mostrar empleados con salarios por encima del promedio".
 
            DISPLAY "0. Cerrar".
 
@@ -196,5 +205,110 @@
            IF SI-NO NOT = "S"
                MOVE "N" TO SI-NO.
 
+
+      * codigo para buscar empleado por el nombre
+
+       Buscar-Empleado-Por-Nombre.
+           DISPLAY "Ingrese el nombre del empleado que desea buscar".
+           ACCEPT Nombre-Buscado.
+           MOVE "1" TO Fin-Del-Archivo.
+           PERFORM Apertura-archivo.
+           PERFORM UNTIL FIN-DEL-ARCHIVO = "0" OR encontrado = "S"
+               READ EMPLEADO-ARCHIVO NEXT RECORD
+                   AT END
+                       *>Cambia a "0" cuando se llega al final del archivo
+                       MOVE "0" TO FIN-DEL-ARCHIVO
+                   NOT AT END
+                       If Empleado-nombre = Nombre-Buscado
+                           MOVE "S" TO encontrado
+                           DISPLAY "Empleado encontrado"
+                           PERFORM Muestra-empleado
+               END-READ
+           END-PERFORM
+           PERFORM cerrar-registro.
+           IF encontrado = "N"
+               DISPLAY "El empleado no se encuentra en el archivo."
+           END-IF.
+
+       Muestra-empleado.
+           MOVE Empleado-cedula TO Muestra-cedula.
+           MOVE Empleado-nombre TO Muestra-nombre.
+           MOVE Empleado-direccion TO Muestra-direccion.
+           MOVE Empleado-telefono TO Muestra-telefono.
+           MOVE Empleado-salario-basico TO Muestra-salario-basico.
+           DISPLAY PRESENTACION.
+
+
+       EMPLEADO-MAS-GANA.
+
+           OPEN INPUT  EMPLEADO-ARCHIVO.
+           MOVE ZEROES TO MAXIMOS-REGISTROS.
+           MOVE "1" TO Fin-Del-Archivo.
+
+            *> Bucle que termina cuando se llega al final del archivo
+           PERFORM UNTIL Fin-Del-Archivo = "0"
+               READ EMPLEADO-ARCHIVO NEXT RECORD
+                   AT END
+                       *>Cambia a "0" cuando se llega al final del archivo
+                       MOVE "0" TO Fin-Del-Archivo
+                   NOT AT END
+                       IF EMPLEADO-SALARIO-BASICO > SALARIO-MAX
+                           MOVE EMPLEADO-NOMBRE TO NOMBRE-EMPLEADO
+                           MOVE EMPLEADO-SALARIO-BASICO TO SALARIO-MAX
+               END-READ
+           END-PERFORM
+
+           DISPLAY "Empleado con el salario maximo: "
+           DISPLAY " " EMPLEADO-NOMBRE.
+           DISPLAY " " SALARIO-MAX.
+
+           CLOSE EMPLEADO-ARCHIVO.
+
+      * codigo para buscar los empleado que tienen sueldos por encima
+      * del promedio.
+
+       MostrarEmpl-sal-encima-promedio.
+           PERFORM Calcular-promedio-salarios.
+           MOVE "1" TO Fin-Del-Archivo.
+           PERFORM Apertura-archivo.
+           PERFORM UNTIL Fin-Del-Archivo = "0"
+               READ EMPLEADO-ARCHIVO NEXT RECORD
+                   AT END
+                       MOVE "0" TO Fin-Del-Archivo
+                   NOT AT END
+                       IF Empleado-salario-basico >
+                           promedio-salario-basico
+                           MOVE "S" TO band-Empleados-encontrados
+                           DISPLAY
+                          "Empleado con salario por encima del promedio"
+                           PERFORM Muestra-empleado
+                END-READ
+           END-PERFORM
+           PERFORM cerrar-registro.
+           IF band-Empleados-encontrados = "N"
+               DISPLAY "No se encontro ningun empleado"
+               DISPLAY "Con salario mayor al promedio"
+           END-IF.
+
+       Calcular-promedio-salarios.
+           MOVE ZEROES TO suma-salarios.
+           MOVE ZEROES TO contador.
+           MOVE ZEROES TO promedio-salario-basico.
+           MOVE "1" TO Fin-Del-Archivo.
+           PERFORM Apertura-archivo.
+           PERFORM UNTIL Fin-Del-Archivo = "0"
+               READ EMPLEADO-ARCHIVO NEXT RECORD
+                   AT END
+                       *>Cambia a "0" cuando se llega al final del archivo
+                       MOVE "0" TO Fin-Del-Archivo
+                   NOT AT END
+                       COMPUTE
+                           suma-salarios =
+                           suma-salarios + Empleado-salario-basico
+                           ADD 1 TO contador
+               END-READ
+           END-PERFORM
+           COMPUTE promedio-salario-basico = suma-salarios/contador.
+           PERFORM cerrar-registro.
 
        END PROGRAM Taller1.
