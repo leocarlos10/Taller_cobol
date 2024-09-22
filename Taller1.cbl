@@ -59,7 +59,7 @@
       * promedio del salario basico de los empleados.
         77 contador PIC 99.
         77 suma-salarios PIC 9(8).
-        77 promedio-salario-basico PIC 9(8).
+        77 promedio-salario-basico PIC Z(8).
         77 band-Empleados-encontrados PIC x VALUE "N".
 
 
@@ -107,6 +107,11 @@
                PERFORM MostrarEmpl-sal-encima-promedio
            END-IF
 
+           IF OPCION = 6
+               PERFORM Calcular-promedio-salarios
+               DISPLAY "Promedio " promedio-salario-basico
+           END-IF
+
            GO TO Empezar-programa.
 
 
@@ -122,7 +127,8 @@
            DISPLAY "4. Buscar info empleado por el nombre".
            DISPLAY
            "5. Mostrar empleados con salarios por encima del promedio".
-
+           DISPLAY "6. Calcular el promedio de los sueldos"
+           DISPLAY "Basicos de la empresa."
            DISPLAY "0. Cerrar".
 
 
