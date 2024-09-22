@@ -38,9 +38,9 @@
            05 Muestra-telefono PIC x(10).
            05 Texto-salario-basico PIC x(19) VALUE "salario basico: ".
            05 Muestra-salario-basico PIC 9(7).
-           01  Fin-Del-Archivo PIC X.
-           01  Maximos-Registros PIC 99.
-           01  Guarda-Enter PIC X.
+        01  Fin-Del-Archivo PIC X.
+        01  Maximos-Registros PIC 99.
+        01  Guarda-Enter PIC X.
       * variables para guardar los datos de los empleados.
          77 cedula PIC x(17)    VALUE  "Ingresa tu cedula".
          77 nombre PIC x(17)    VALUE  "Ingresa tu nombre".
@@ -61,8 +61,10 @@
         77 suma-salarios PIC 9(8).
         77 promedio-salario-basico PIC Z(8).
         77 band-Empleados-encontrados PIC x VALUE "N".
-
-
+      
+      * Salario Anual
+       77 Cedula-Buscada PIC x(10).
+       01 SALARIO-ANUAL PIC 9(9)V99 VALUE 0.      
 
        PROCEDURE DIVISION.
 
@@ -70,29 +72,30 @@
 
        Empezar-programa.
            PERFORM INTERFAZ-APP.
+        
+           DISPLAY "Selecione > ".
+           ACCEPT  opcion.
 
            IF OPCION = 0
                STOP RUN
-           END-IF
+           END-IF.
 
            IF OPCION = 1
-            PERFORM Apertura-archivo
-            MOVE ZEROES TO Maximos-Registros
-            MOVE "1" TO Fin-Del-Archivo
-            PERFORM Lee-Siguiente-Registro
-            PERFORM Muestra-Registro
+               PERFORM Apertura-archivo
+               MOVE ZEROES TO Maximos-Registros
+               MOVE "1" TO Fin-Del-Archivo
+               PERFORM Lee-Siguiente-Registro
+               PERFORM Muestra-Registro
                UNTIL Fin-Del-Archivo = "0"
-            PERFORM cerrar-registro
-
+               PERFORM cerrar-registro
            END-IF
 
            IF OPCION = 2
-            PERFORM Abrir-archivo
-            MOVE "S" TO si-no
-            PERFORM Agregar-registro
-             UNTIL si-no = "N"
-           PERFORM cerrar-registro
-
+               PERFORM Abrir-archivo
+               MOVE "S" TO si-no
+               PERFORM Agregar-registro
+               UNTIL si-no = "N"
+               PERFORM cerrar-registro
            END-IF
 
            IF OPCION = 3
@@ -112,9 +115,11 @@
                DISPLAY "Promedio " promedio-salario-basico
            END-IF
 
+           IF OPCION = 7
+               PERFORM SALRIO-ANUAL-EMPLEADO
+           END-IF
+
            GO TO Empezar-programa.
-
-
 
        Interfaz-App.
            DISPLAY "-----------------------------------".
@@ -125,15 +130,10 @@
            DISPLAY "2. Ingresar empleados".
            DISPLAY "3. Mostrar el empleado que mas gana ".
            DISPLAY "4. Buscar info empleado por el nombre".
-           DISPLAY
-           "5. Mostrar empleados con salarios por encima del promedio".
+           DISPLAY "5. Ver empleados con salarios encima del promedio".
            DISPLAY "6. Calcular el promedio de los sueldos"
-           DISPLAY "Basicos de la empresa."
+           DISPLAY "7. Ver Salario Anual Empleado"
            DISPLAY "0. Cerrar".
-
-
-           DISPLAY "Selecione > ".
-           ACCEPT  opcion.
 
 
       * codigo para mostrar todos los empleados
@@ -225,6 +225,8 @@
            DISPLAY "Ingrese el nombre del empleado que desea buscar".
            ACCEPT Nombre-Buscado.
            MOVE "1" TO Fin-Del-Archivo.
+           MOVE "N" TO encontrado
+
            PERFORM Apertura-archivo.
            PERFORM UNTIL FIN-DEL-ARCHIVO = "0" OR encontrado = "S"
                READ EMPLEADO-ARCHIVO NEXT RECORD
@@ -323,5 +325,38 @@
            END-PERFORM
            COMPUTE promedio-salario-basico = suma-salarios/contador.
            PERFORM cerrar-registro.
+
+       SALRIO-ANUAL-EMPLEADO.
+          
+           DISPLAY "Ingrese Cedula del Empleado: ".
+           ACCEPT CEDULA-BUSCADA .
+           MOVE "1" TO Fin-Del-Archivo.
+           MOVE "N" TO encontrado
+           PERFORM Apertura-archivo.
+
+
+           PERFORM UNTIL FIN-DEL-ARCHIVO = "0" 
+               READ EMPLEADO-ARCHIVO NEXT RECORD
+                   AT END
+                       *>Cambia a "0" cuando se llega al final del archivo
+                       MOVE "0" TO FIN-DEL-ARCHIVO
+                   NOT AT END
+                       If Empleado-cedula = CEDULA-BUSCADA
+                           MOVE "S" TO encontrado
+                           DISPLAY "Empleado encontrado"
+                           PERFORM Muestra-empleado
+                           
+                          COMPUTE SALARIO-ANUAL =
+                           EMPLEADO-SALARIO-BASICO * 12
+
+                          DISPLAY "EL SALARIO ANUAL ES " SALARIO-ANUAL        
+
+               END-READ
+           END-PERFORM
+           PERFORM cerrar-registro.
+           IF encontrado = "N"
+               DISPLAY "El empleado no se encuentra en el archivo."
+           END-IF.
+       
 
        END PROGRAM Taller1.
